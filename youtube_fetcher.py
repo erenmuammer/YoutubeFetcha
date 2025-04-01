@@ -10,9 +10,7 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-API_KEY = os.environ.get("YOUTUBE_API_KEY")
-if not API_KEY:
-    print("UYARI: YOUTUBE_API_KEY çevre değişkeni bulunamadı. API çağrıları çalışmayacak.")
+API_KEY = os.getenv("YOUTUBE_API_KEY")
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
 
