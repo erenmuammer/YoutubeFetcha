@@ -1,4 +1,4 @@
-# YouTube Channel Video Exporter
+# YoutubeFetcha
 
 A Streamlit web application that allows you to export video data from YouTube channels. You can fetch either the latest 200 videos or the top 200 most popular videos from any YouTube channel.
 
@@ -28,8 +28,8 @@ A Streamlit web application that allows you to export video data from YouTube ch
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ytdatafetch.git
-cd ytdatafetch
+git clone https://github.com/yourusername/YoutubeFetcha.git
+cd YoutubeFetcha
 ```
 
 2. Create a virtual environment (recommended):
