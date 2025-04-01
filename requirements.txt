@@ -1,0 +1,6 @@
+streamlit
+google-api-python-client
+google-auth-oauthlib
+pandas
+python-dotenv
+openpyxl 
