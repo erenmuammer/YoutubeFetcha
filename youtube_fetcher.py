@@ -1,13 +1,18 @@
 import os
 import re
+import requests
+from datetime import datetime
 import pandas as pd
+from urllib.parse import urlparse, parse_qs
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-API_KEY = os.getenv("YOUTUBE_API_KEY")
+API_KEY = os.environ.get("YOUTUBE_API_KEY")
+if not API_KEY:
+    print("UYARI: YOUTUBE_API_KEY çevre değişkeni bulunamadı. API çağrıları çalışmayacak.")
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
 
@@ -159,6 +164,7 @@ def get_video_details(youtube, video_ids):
             response = request.execute()
 
             for item in response.get("items", []):
+                video_id = item["id"]
                 title = item["snippet"]["title"]
                 published_at = item["snippet"]["publishedAt"]
                 # Format date/time nicely
@@ -171,7 +177,8 @@ def get_video_details(youtube, video_ids):
                     "Title": title,
                     "Published At": published_date,
                     "View Count": int(view_count),
-                    "Comment Count": int(comment_count) # Add comment count
+                    "Comment Count": int(comment_count), # Add comment count
+                    "Link": f"https://www.youtube.com/watch?v={video_id}" # Add video link
                 })
         except HttpError as e:
             print(f"An HTTP error {e.resp.status} occurred fetching video details: {e.content}")
@@ -182,12 +189,13 @@ def get_video_details(youtube, video_ids):
 
     return video_details
 
-def fetch_all_channel_videos(channel_url, sort_by='latest'):
+def fetch_all_channel_videos(channel_url, sort_by='latest', max_videos=200):
     """Main function to fetch video details for a given channel URL, sorted either by latest or popularity.
 
     Args:
         channel_url (str): The URL of the YouTube channel.
         sort_by (str): Sorting criteria - 'latest' or 'popular'. Defaults to 'latest'.
+        max_videos (int): Maximum number of videos to fetch
 
     Returns:
         tuple: A pandas DataFrame with video details and a status message, or (None, error_message).
@@ -255,10 +263,9 @@ def fetch_all_channel_videos(channel_url, sort_by='latest'):
         # -------------------------------------------
 
         # --- Limit to top 200 --- 
-        limit = 200
         original_count = len(df)
-        if original_count > limit:
-            df = df.head(limit)
+        if original_count > max_videos:
+            df = df.head(max_videos)
             # Adjust message for clarity based on sort type
             if sort_by == 'popular':
                  limit_message = f"top {len(df)} {sort_description}"

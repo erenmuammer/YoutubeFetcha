@@ -36,6 +36,13 @@ st.markdown("""
     h1 {
         color: #FF4B4B;
     }
+    .dataframe a {
+        color: #FF4B4B;
+        text-decoration: none;
+    }
+    .dataframe a:hover {
+        text-decoration: underline;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -46,9 +53,12 @@ st.title("📊 YouTube Channel Video Exporter")
 # --- Helper Function to Convert DataFrame to Excel in Memory ---
 def to_excel(df):
     output = io.BytesIO()
-    # Use openpyxl engine explicitly if needed, pandas usually detects it
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Videos')
+        # Create a copy of the dataframe for Excel export
+        df_excel = df.copy()
+        # Convert links to clickable format in Excel
+        df_excel['Link'] = df_excel['Link'].apply(lambda x: f'=HYPERLINK("{x}","Watch Video")')
+        df_excel.to_excel(writer, index=False, sheet_name='Videos')
     processed_data = output.getvalue()
     return processed_data
 
@@ -60,34 +70,52 @@ channel_url = st.text_input(
 )
 
 # --- Selection for Sorting --- 
-sort_option = st.radio(
-    "Select Video Ranking:",
-    ('Latest 200 Videos', 'Top 200 Most Popular Videos'),
-    horizontal=True, # Display options side-by-side
-    label_visibility="collapsed"
-)
+col1, col2 = st.columns(2)
+with col1:
+    sort_option = st.radio(
+        "Select Video Ranking:",
+        ('Latest Videos', 'Most Popular Videos'),
+        horizontal=True, # Display options side-by-side
+        label_visibility="collapsed"
+    )
+    
+with col2:
+    video_count = st.selectbox(
+        "Number of Videos",
+        options=[10, 50, 100, 200],
+        index=0, # Default to 10 videos
+    )
 
 if st.button("🚀 Fetch Videos"):
     if channel_url:
         # Determine sort_by parameter based on user choice
-        if sort_option == 'Latest 200 Videos':
+        if sort_option == 'Latest Videos':
             sort_key = 'latest'
-            sort_desc = "Latest 200"
+            sort_desc = f"Latest {video_count}"
         else:
             sort_key = 'popular'
-            sort_desc = "Top 200 Most Popular"
+            sort_desc = f"Top {video_count} Most Popular"
 
         st.write(f"Fetching the **{sort_desc}** videos for the channel...")
         with st.spinner("🔍 Fetching video data... This might take a moment..."):
             try:
-                # Call the fetcher function with the sort key
-                df_videos, message = fetch_all_channel_videos(channel_url, sort_by=sort_key)
+                # Call the fetcher function with the sort key and video count
+                df_videos, message = fetch_all_channel_videos(channel_url, sort_by=sort_key, max_videos=video_count)
 
                 if df_videos is not None and not df_videos.empty:
                     st.success(f"✅ {message}")
 
+                    # Create clickable links in the DataFrame while keeping the separate Link column
+                    df_display = df_videos.copy()
+                    
+                    # Rename Link column to be more descriptive
+                    df_display = df_display.rename(columns={'Link': 'Video URL'})
+
                     st.subheader(f"📈 Data Preview (First 5 of {sort_desc})")
-                    st.dataframe(df_videos.head(5))
+                    st.dataframe(
+                        df_display.head(5),
+                        use_container_width=True
+                    )
 
                     excel_data = to_excel(df_videos)
 
@@ -96,7 +124,7 @@ if st.button("🚀 Fetch Videos"):
                         if channel_name_match:
                             channel_name = channel_name_match.group(1)
                             safe_channel_name = re.sub(r'[^\w\- ]', '', channel_name).strip().replace(' ', '_')
-                            # Update filename based on sort key
+                            # Update filename based on sort key and count
                             file_name_suffix = "latest" if sort_key == 'latest' else "popular"
                             file_name = f"{safe_channel_name}_{file_name_suffix}_{len(df_videos)}_videos.xlsx"
                         else:
