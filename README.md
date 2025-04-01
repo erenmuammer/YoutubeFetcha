@@ -1,91 +1,77 @@
-# YouTube Video Data Fetcher
+# YouTube Data Fetcher
 
-A Python application to fetch and export video data from YouTube channels. This tool uses the YouTube Data API v3 to retrieve video information such as titles, publication dates, and view counts, then presents it in a clean interface with options to download the data as an Excel file.
+A Python application that allows users to fetch video data from a YouTube channel using the YouTube Data API v3. The app provides a user interface to input a YouTube channel link and displays a preview of the fetched data, including video titles, publication dates, view counts, and clickable links. The data can be exported to an Excel file.
 
 ## Features
 
-- **Easy Channel Selection**: Enter any YouTube channel URL or handle
-- **Flexible Video Sorting**: Choose between latest videos or most popular videos
-- **Customizable Results**: Select how many videos to retrieve (10, 50, 100, or 200)
-- **Clickable Links**: Video links are clickable both in the UI and in the exported Excel file
-- **Simple Data Export**: Download the results as a formatted Excel file
+- Fetch videos from any YouTube channel by URL or channel ID
+- Choose between latest or most popular videos
+- Select number of videos to fetch (10, 50, 100, 200)
+- Preview data in the app
+- Export to Excel with clickable links
+- Easy-to-use interface
 
-## Requirements
+## Setup
 
-- Python 3.6+
-- YouTube Data API v3 Key
-- Required Python packages (see `requirements.txt`)
-
-## Installation
-
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/ytdatafetch.git
-   cd ytdatafetch
-   ```
-
-2. Install the required packages:
+1. Clone this repository
+2. Install the required dependencies:
    ```
    pip install -r requirements.txt
    ```
+3. **Important**: Set your YouTube Data API key as an environment variable:
+   ```
+   export YOUTUBE_API_KEY=your_api_key_here
+   ```
+   **Never hardcode your API key directly in the source code!**
 
-3. Set up your YouTube API key:
-   - Create a `.env` file in the root directory
-   - Add your YouTube API key: `YOUTUBE_API_KEY=your_api_key_here`
-
-## Usage
-
-1. Run the Streamlit app:
+4. Run the app:
    ```
    streamlit run app.py
    ```
 
-2. Enter a YouTube channel URL (in any of these formats):
-   - `https://www.youtube.com/@channelname`
-   - `https://www.youtube.com/channel/CHANNEL_ID`
-   - `@channelname`
+## How to get a YouTube API Key
 
-3. Select your preferences:
-   - Choose between "Latest Videos" or "Most Popular Videos"
-   - Select the number of videos to fetch (10, 50, 100, or 200)
+1. Go to the [Google Developers Console](https://console.developers.google.com/)
+2. Create a new project
+3. Enable the YouTube Data API v3
+4. Create credentials (API Key)
+5. Use the API key as an environment variable
 
-4. Click "Fetch Videos" to retrieve the data
+## Usage
 
-5. Download the results using the "Download Excel File" button
+1. Enter a YouTube channel URL (e.g., https://www.youtube.com/@channelname)
+2. Choose sorting option (latest videos or most popular)
+3. Select the number of videos to fetch
+4. Click "Fetch Videos" and wait for the data to load
+5. Preview the data and download the Excel file
 
-## API Key Information
+## Dependencies
 
-To use this application, you need a YouTube Data API v3 key:
+- streamlit
+- pandas
+- google-api-python-client
+- openpyxl
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (or select an existing one)
-3. Navigate to "APIs & Services" > "Library"
-4. Search for "YouTube Data API v3" and enable it
-5. Go to "APIs & Services" > "Credentials"
-6. Create an API key and copy it
-7. Paste the key in your `.env` file
+## Features of the Exported Data
 
-## Security Notes
-
-- Never commit your `.env` file to version control
-- The `.gitignore` file is configured to exclude the `.env` file
-- For production deployment, use environment variables on your hosting platform
-
-## Example Output
-
-The application provides a preview of the data and allows you to download it as an Excel file with the following columns:
-
-- Title
-- Published Date
+- Video Title
+- Video URL
+- Publication Date
 - View Count
-- Video URL (clickable)
+- Like Count
+- Comment Count
+- Duration
+- Description
+- Thumbnail URL
 
-## Limitations
+## Contributing
 
-- The YouTube Data API has quota limits (10,000 units per day)
-- Each request for video details consumes quota units
-- Be mindful of the number of videos you fetch to avoid exceeding your quota
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Disclaimer
+
+This tool is not affiliated with YouTube or Google. It uses the official YouTube Data API to fetch publicly available data. 
